@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable(); // guest user can submit answer
             $table->foreignId('poll_id')->constrained()->cascadeOnDelete();
             $table->foreignId('poll_option_id');
+            $table->string('ip_address')->nullable();
             $table->timestamps();
         });
     }

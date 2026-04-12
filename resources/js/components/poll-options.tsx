@@ -5,7 +5,8 @@ import { RadioGroup } from './ui/radio-group';
 export default function PollOptions({
     idMultichoice,
     slug,
-    options = []
+    options = [],
+    answer = []
 }: { slug: string; idMultichoice: boolean, options: PollOptions[] }) {
     if (idMultichoice) {
         return (
@@ -17,6 +18,8 @@ export default function PollOptions({
                                 name={option.id.toString()}
                                 id={option.option_text}
                                 value={option.id}
+                                defaultChecked={answer.some((ans: any) => ans.poll_option_id === option.id)}
+                                disabled={answer.length > 0}
                             />
                             <Label htmlFor={option.option_text}>{option.option_text}</Label>
                         </div>

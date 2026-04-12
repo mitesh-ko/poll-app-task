@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PollAnswerAdded;
 use App\Models\Poll;
 use App\Models\PollAnswer;
 use Illuminate\Http\Request;
@@ -20,7 +21,14 @@ class PollController extends Controller
         ])->firstOrFail();
 
         return Inertia::render('poll/show', [
-            'poll' => $poll
+            'poll' => $poll,
+            'ansCount' => $poll->answers()->count(),
+            'canAns' => $poll->whereHas('answers', function ($query) {
+                $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
+            })->count(),
+            'answer' => PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
+                $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
+            })->select(['id', 'poll_option_id'])->get(),
         ]);
     }
 
@@ -35,6 +43,7 @@ class PollController extends Controller
         $data = [
             'user_id' => $userId,
             'poll_id' => $poll->id,
+            'ip_address' => $request->ip(),
         ];
         if ($poll->is_multichoice) {
             $storeData = [];
@@ -49,6 +58,7 @@ class PollController extends Controller
             $data['poll_option_id'] = $request->{$slug};
             PollAnswer::create($data);
         }
+        broadcast(new PollAnswerAdded($poll))->toOthers();
 
         return redirect()->back();
     }

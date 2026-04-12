@@ -18,9 +18,13 @@ class Poll extends Model
         });
     }
 
-
     public function options(): HasMany
     {
         return $this->hasMany(PollOptions::class);
+    }
+
+    public function answers(): HasMany
+    {
+        return $this->hasMany(PollAnswer::class);
     }
 }
