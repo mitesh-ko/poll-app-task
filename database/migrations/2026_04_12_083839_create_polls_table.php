@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('slug')->unique()->index(); // datatype is varchar for better performance
             $table->unsignedTinyInteger('is_multichoice')->default(0);
             $table->timestamp('end_at')->nullable();
-            $table->json('data')->comment('store answer summary and other malicious data'); // implement DTO to ensure only verified data keys can store.
+            $table->json('data')->nullable()->comment('store answer summary and other malicious data'); // implement DTO to ensure only verified data keys can store.
             $table->timestamps();
         });
     }
