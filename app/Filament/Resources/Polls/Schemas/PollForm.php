@@ -7,7 +7,9 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
 
 class PollForm
 {
@@ -16,7 +18,9 @@ class PollForm
         return $schema
             ->components([
                 TextInput::make('question')
-                    ->required(),
+                    ->required()
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
                 Textarea::make('description')
                     ->columnSpanFull(),
                 TextInput::make('slug')
