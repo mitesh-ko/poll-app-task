@@ -4,7 +4,7 @@ namespace App\Filament\Resources\Polls\Pages;
 
 use App\Filament\Resources\Polls\PollResource;
 use App\Models\PollAnswer;
-use App\Models\PollOptions;
+use App\Models\PollOption;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
 use League\Uri\Builder;
@@ -29,7 +29,7 @@ class ResultPoll extends Page
         return [
             'poll' => $this->record,
             'ansCount' => PollAnswer::answerCount($this->record->id),
-            'pollOptions' => PollOptions::where('poll_id', $this->record->id)->get(),
+            'pollOptions' => PollOption::where('poll_id', $this->record->id)->get(),
         ];
     }
 }

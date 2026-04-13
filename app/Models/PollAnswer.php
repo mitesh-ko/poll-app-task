@@ -10,7 +10,7 @@ class PollAnswer extends Model
 {
     public function pollOption()
     {
-        return $this->belongsTo(PollOptions::class, 'poll_option_id');
+        return $this->belongsTo(PollOption::class, 'poll_option_id');
     }
 
     public function poll()

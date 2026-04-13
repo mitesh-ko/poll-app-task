@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Poll;
+use App\Models\PollOption;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,13 +17,29 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         if (app()->environment('local')) {
-            User::factory(10)->create();
+            $user = User::factory()->create();
+            $polls = Poll::factory()
+                ->count(10)
+                ->for($user, 'user')
+                ->create();
+            
+            foreach($polls as $poll) {
+                PollOption::factory()
+                ->count(3)
+                ->for($poll)
+                ->create();
+            }
         }
 
-        User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'admin@chatway.com',
-            'password' => Hash::make('chatway@admin1'),
-        ]);
+        User::updateOrCreate(
+            [
+                'name' => 'Admin'
+            ],
+            [
+                'name' => 'Admin',
+                'email' => 'admin@chatway.com',
+                'password' => Hash::make('chatway@admin1'),
+            ]
+        );
     }
 }
