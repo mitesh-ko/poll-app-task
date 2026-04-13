@@ -55,7 +55,7 @@ class PollController extends Controller
             $messages["{$key}.exists"] = 'The selected option is invalid for the poll.';
             $messages["{$key}.max"] = 'The selected option is too long.';
         }
-        $request->validate($rules, $messages);
+        $validData = $request->validate($rules, $messages);
         // validate request!
 
         $poll = Poll::where('slug', $slug)->firstOrFail();
@@ -72,7 +72,7 @@ class PollController extends Controller
         ];
         
         $storeData = [];
-        foreach ($request->all() as $value) {
+        foreach ($validData as $value) {
             $ansData['poll_option_id'] = $value;
             $ansData['created_at'] = now();
             $ansData['updated_at'] = now();
