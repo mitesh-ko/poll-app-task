@@ -29,9 +29,7 @@ class PollController extends Controller
         $canAns = $this->canAnswer($poll);
 
         // user selected answer
-        $answer = PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
-            $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
-        })->select(['id', 'poll_option_id'])->get();
+        $answer = $this->userAnswers($poll);
 
         $ansCount = PollAnswer::answerCount($poll->id);
 
@@ -104,7 +102,21 @@ class PollController extends Controller
     public function canAnswer($poll)
     {
         return PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
-            $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
+            if(auth()->check()){
+                $query->where('user_id', auth()->id());
+            } else {
+                $query->Where('ip_address', request()->ip());
+            }
         })->count() == 0 && $poll->end_at > now();
+    }
+
+    public function userAnswers($poll) {
+        return PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
+            if(auth()->check()){
+                $query->where('user_id', auth()->id());
+            } else {
+                $query->Where('ip_address', request()->ip());
+            }
+        })->select(['id', 'poll_option_id'])->get();
     }
 }
