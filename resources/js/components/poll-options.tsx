@@ -13,10 +13,10 @@ export default function PollOptions({
         return (
             <>
                 {
-                    options.map((option: PollOptions) => (
+                    options.map((option: PollOptions, i: number) => (
                         <div className="flex items-center space-x-3" key={option.option_text}>
                             <Checkbox
-                                name={option.id.toString()}
+                                name={`${slug}-${i}`}
                                 id={option.option_text}
                                 value={option.id}
                                 defaultChecked={answer.some((ans: any) => ans.poll_option_id === option.id)}
@@ -32,7 +32,7 @@ export default function PollOptions({
     } else {
         return (
             <RadioGroup
-                name={slug}
+                name={`${slug}-0`}
                 items={options}
                 value={answer[0]?.poll_option_id?.toString()}
                 disabled={answer.length > 0}

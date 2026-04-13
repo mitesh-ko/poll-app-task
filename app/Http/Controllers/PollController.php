@@ -26,9 +26,7 @@ class PollController extends Controller
         ])->firstOrFail();
 
         // check if user already sub answer on poll
-        $canAns = PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
-            $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
-        })->count();
+        $canAns = $this->canAnswer($poll);
 
         // user selected answer
         $answer = PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
@@ -40,7 +38,7 @@ class PollController extends Controller
         return Inertia::render('poll/show', [
             'poll' => $poll,
             'ansCount' => $ansCount,
-            'canAns' => $canAns == 0,
+            'canAns' => $canAns,
             'answer' => $answer
         ]);
     }
@@ -49,29 +47,41 @@ class PollController extends Controller
      * Store user poll answers
      */
     public function store(Request $request, $slug): RedirectResponse
-    {        
+    {
+        // validate request
+        if (empty($request->all())) {
+            return back()->withErrors([$slug => 'Select option to vote on the poll.']);
+        }
+        foreach($request->all() as $key => $value) {
+            $rules[$key] = 'max:255|exists:poll_options,id';
+            $messages["{$key}.exists"] = 'The selected option is invalid for the poll.';
+            $messages["{$key}.max"] = 'The selected option is too long.';
+        }
+        $request->validate($rules, $messages);
+        // validate request!
+
         $poll = Poll::where('slug', $slug)->firstOrFail();
 
-        $data = [
-            'user_id' => auth()->id(), // auth user if or null
+        $canAns = $this->canAnswer($poll);
+        if(!$canAns) {
+            return back()->withErrors([$slug => 'You have already answered on this poll.']);
+        }
+
+        $ansData = [
+            'user_id' => auth()->id(), // auth user id or null
             'poll_id' => $poll->id,
             'ip_address' => $request->ip(),
         ];
-        if ($poll->is_multichoice) {
-            $storeData = [];
-            foreach (array_values($request->all()) as $ans) {
-                $data['poll_option_id'] = $ans;
-                $data['created_at'] = now();
-                $data['updated_at'] = now();
-                $storeData[] = $data;
-            }
-            // insert will not trigger model event
-            // insert used here to store all data in one query
-            PollAnswer::insert($storeData);
-        } else {
-            $data['poll_option_id'] = $request->{$slug};
-            PollAnswer::create($data);
+        
+        $storeData = [];
+        foreach ($request->all() as $value) {
+            $ansData['poll_option_id'] = $value;
+            $ansData['created_at'] = now();
+            $ansData['updated_at'] = now();
+            $storeData[] = $ansData;
         }
+        PollAnswer::insert($storeData);
+
         $this->updatePollPercentage($poll);
 
         broadcast(new PollAnswerAdded($poll))->toOthers();
@@ -89,5 +99,12 @@ class PollController extends Controller
             $option->percentage = round(($option->answers()->count() / $totalAnswers) * 100, 2);
             $option->save();
         }
+    }
+
+    public function canAnswer($poll)
+    {
+        return PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
+            $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
+        })->count() == 0 && $poll->end_at > now();
     }
 }

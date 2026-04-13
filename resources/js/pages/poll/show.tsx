@@ -43,8 +43,13 @@ export default function Show({ poll, ansCount, canAns, answer }: {
                         resetOnSuccess={['password']}
                         className="flex flex-col gap-6"
                     >
-                        {({ processing }) => (
+                        {({ processing, errors }) => (
                             <>
+                            {Object.values(errors)?.map((error) => (
+                                <div key={error} className="text-red-500">
+                                    {error}
+                                </div>
+                            ))}
                                 <PollOptions
                                     idMultichoice={!!poll.is_multichoice}
                                     options={poll.options}

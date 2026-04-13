@@ -18,7 +18,7 @@ class PollOptionFactory extends Factory
     public function definition(): array
     {
         return [
-            'option_text' => '',
+            'option_text' => fake()->word(),
             'percentage' => fake()->numberBetween(10, 100)
         ];
     }
