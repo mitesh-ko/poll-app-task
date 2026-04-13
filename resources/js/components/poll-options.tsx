@@ -33,6 +33,8 @@ export default function PollOptions({
             <RadioGroup
                 name={slug}
                 items={options}
+                value={answer[0]?.poll_option_id}
+                disabled={answer.length > 0}
             />
         )
     }

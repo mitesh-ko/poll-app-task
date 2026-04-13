@@ -1,5 +1,5 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
-import { CheckIcon, CircleIcon } from "lucide-react"
+import { CircleIcon } from "lucide-react"
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
@@ -7,33 +7,38 @@ import { Label } from "./label"
 
 function RadioGroup({
   className,
+  items = [],
+  value = '',
   ...props
-}: React.ComponentProps<typeof RadioGroupPrimitive.Root> | any) {
+}: React.ComponentProps<typeof RadioGroupPrimitive.Root> & { items?: any[] }) {
   return (
     <RadioGroupPrimitive.Root
       data-slot="radio"
-      className={cn(
-        "peer border-input data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-full border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
-        className
-      )}
+      className={cn("flex flex-col gap-2.5", className)}
       {...props}
+      defaultValue={value?.toString()}
     >
-      {
-        props.items.map((item: any) => (
-          <div className="w-5" key={item.option_text}>
-            <RadioGroupPrimitive.Item id={item.option_text} value={item.id}>
-              <RadioGroupPrimitive.Indicator
-                data-slot="checkbox-indicator"
-                className="flex items-center justify-center text-current transition-none"
-              >
-                <CircleIcon fill="black" className="size-3.5" />
-              </RadioGroupPrimitive.Indicator>
-            </RadioGroupPrimitive.Item>
-            <Label htmlFor={item.option_text}>{item.option_text}</Label>
-          </div>
-        ))
-      }
-
+      {items.map((item: any) => (
+        <div
+          key={item.id}
+          className="flex items-center space-x-3"
+        >
+          <RadioGroupPrimitive.Item
+            id={item.option_text}
+            value={item.id?.toString()}
+            disabled={props.disabled}
+            className={cn(
+              "peer size-4 rounded-full border border-input shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+              "data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+            )}
+          >
+            <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
+              <CircleIcon fill="currentColor" className="size-2" />
+            </RadioGroupPrimitive.Indicator>
+          </RadioGroupPrimitive.Item>
+          <Label htmlFor={item.option_text}>{item.option_text}</Label>
+        </div>
+      ))}
     </RadioGroupPrimitive.Root>
   )
 }

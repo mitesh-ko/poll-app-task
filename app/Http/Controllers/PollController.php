@@ -10,6 +10,9 @@ use Inertia\Inertia;
 
 class PollController extends Controller
 {
+    /**
+     * Load inertia view with respective data
+     */
     public function show($slug)
     {
         $poll = Poll::with('options:id,poll_id,option_text')->where('slug', $slug)->select([
@@ -20,18 +23,27 @@ class PollController extends Controller
             'end_at'
         ])->firstOrFail();
 
+        $canAns = PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
+            $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
+        })->count();
+
+        $answer = PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
+            $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
+        })->select(['id', 'poll_option_id'])->get();
+
+        $ansCount = PollAnswer::answerCount($poll->id);
+
         return Inertia::render('poll/show', [
             'poll' => $poll,
-            'ansCount' => $poll->answers()->count(),
-            'canAns' => $poll->whereHas('answers', function ($query) {
-                $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
-            })->count(),
-            'answer' => PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
-                $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
-            })->select(['id', 'poll_option_id'])->get(),
+            'ansCount' => $ansCount,
+            'canAns' => $canAns == 0,
+            'answer' => $answer
         ]);
     }
 
+    /**
+     * Store user poll answers
+     */
     public function store(Request $request, $slug)
     {
         $userId = null;

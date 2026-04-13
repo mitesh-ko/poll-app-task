@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\PollAnswer;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -37,7 +38,10 @@ class PollAnswerAdded implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'ansCount' => $this->poll->answers()->count(),
+            'ansCount' => PollAnswer::where('poll_id', $this->poll->id)
+            ->distinct('user_id')
+            ->distinct('ip_address')
+            ->count()
         ];
     }
 }
