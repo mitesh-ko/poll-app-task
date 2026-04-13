@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Polls;
 use App\Filament\Resources\Polls\Pages\CreatePoll;
 use App\Filament\Resources\Polls\Pages\EditPoll;
 use App\Filament\Resources\Polls\Pages\ListPolls;
+use App\Filament\Resources\Polls\Pages\ResultPoll;
 use App\Filament\Resources\Polls\Schemas\PollForm;
 use App\Filament\Resources\Polls\Tables\PollsTable;
 use App\Models\Poll;
@@ -18,7 +19,7 @@ class PollResource extends Resource
 {
     protected static ?string $model = Poll::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCursorArrowRays;
 
     protected static ?string $recordTitleAttribute = 'question';
 
@@ -45,6 +46,7 @@ class PollResource extends Resource
             'index' => ListPolls::route('/'),
             'create' => CreatePoll::route('/create'),
             'edit' => EditPoll::route('/{record}/edit'),
+            'answer' => ResultPoll::route('/{record}/results'),
         ];
     }
 }

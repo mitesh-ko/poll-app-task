@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Polls\Tables;
 
+use App\Filament\Resources\Polls\Pages\ResultPoll;
+use App\Models\Poll;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
@@ -36,6 +38,11 @@ class PollsTable
             ])
             ->recordActions([
                 EditAction::make(),
+
+                Action::make('view_results')
+                ->label('View Result')
+                ->url(fn (Poll $record): string => ResultPoll::getUrl(['record' => $record->id], 'results')), 
+
                 Action::make('copyLink')
                 ->label('Poll Link')
                 ->icon('heroicon-o-clipboard')
