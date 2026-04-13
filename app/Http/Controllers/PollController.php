@@ -7,13 +7,15 @@ use App\Models\Poll;
 use App\Models\PollAnswer;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class PollController extends Controller
 {
     /**
      * Load inertia view with respective data
      */
-    public function show($slug)
+    public function show($slug): Response
     {
         $poll = Poll::with('options:id,poll_id,option_text')->where('slug', $slug)->select([
             'id',
@@ -23,10 +25,12 @@ class PollController extends Controller
             'end_at'
         ])->firstOrFail();
 
+        // check if user already sub answer on poll
         $canAns = PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
             $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
         })->count();
 
+        // user selected answer
         $answer = PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
             $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
         })->select(['id', 'poll_option_id'])->get();
@@ -44,16 +48,12 @@ class PollController extends Controller
     /**
      * Store user poll answers
      */
-    public function store(Request $request, $slug)
-    {
-        $userId = null;
-        if (auth()->check()) {
-            $userId = auth()->id();
-        }
+    public function store(Request $request, $slug): RedirectResponse
+    {        
         $poll = Poll::where('slug', $slug)->firstOrFail();
 
         $data = [
-            'user_id' => $userId,
+            'user_id' => auth()->id(), // auth user if or null
             'poll_id' => $poll->id,
             'ip_address' => $request->ip(),
         ];
@@ -65,6 +65,8 @@ class PollController extends Controller
                 $data['updated_at'] = now();
                 $storeData[] = $data;
             }
+            // insert will not trigger model event
+            // insert used here to store all data in one query
             PollAnswer::insert($storeData);
         } else {
             $data['poll_option_id'] = $request->{$slug};
