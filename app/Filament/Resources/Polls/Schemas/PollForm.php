@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Polls\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -25,6 +26,8 @@ class PollForm
                     ->columnSpanFull(),
                 TextInput::make('slug')
                     ->required(),
+                Hidden::make('user_id')
+                    ->default(auth()->id()),
                 DateTimePicker::make('end_at')
                     ->required(),
                 Toggle::make('is_multichoice')
