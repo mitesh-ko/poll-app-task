@@ -99,6 +99,10 @@ class PollController extends Controller
         }
     }
 
+    /**
+     * @return boolean
+     * return true of user can answer for poll or false if no
+     */
     public function canAnswer($poll)
     {
         return PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
@@ -110,6 +114,9 @@ class PollController extends Controller
         })->count() == 0 && $poll->end_at > now();
     }
 
+    /**
+     * Get user answers besaed on auth id or user ip
+     */
     public function userAnswers($poll) {
         return PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
             if(auth()->check()){
