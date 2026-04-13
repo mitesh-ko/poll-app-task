@@ -8,14 +8,17 @@ import SettingsLayout from '@/layouts/settings/layout';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import PublicLayout from './layouts/public-layout';
+import { useEffect } from 'react';
 
-window.Pusher = Pusher;
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: import.meta.env.VITE_PUSHER_APP_KEY,
-    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-    forceTLS: true,
-});
+if (typeof window !== 'undefined') {
+    window.Pusher = Pusher;
+    window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: import.meta.env.VITE_PUSHER_APP_KEY,
+        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+        forceTLS: true,
+    });
+}
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

@@ -6,13 +6,17 @@ import { Spinner } from '@/components/ui/spinner';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 
-export default function Show({ poll, ansCount, canAns, answer }: any) {
+export default function Show({ poll, ansCount, canAns, answer }: { 
+    poll: PollShow; ansCount: number; canAns: boolean, answer: PollAnswers[] }) {
+
     const [count, setCount] = useState(ansCount);
     const [isEnded, setIsEnded] = useState(dayjs().isAfter(poll.end_at));
-    window.Echo.channel(poll.slug)
-        .listen('PollAnswerAdded', (e: any) => {
-            setCount(e.ansCount);
-        });
+    if (typeof window !== 'undefined') {
+        window.Echo.channel(poll.slug)
+            .listen('PollAnswerAdded', (e: any) => {
+                setCount(e.ansCount);
+            });
+    }
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -42,7 +46,7 @@ export default function Show({ poll, ansCount, canAns, answer }: any) {
                         {({ processing }) => (
                             <>
                                 <PollOptions
-                                    idMultichoice={poll.is_multichoice}
+                                    idMultichoice={!!poll.is_multichoice}
                                     options={poll.options}
                                     slug={poll.slug}
                                     answer={answer}

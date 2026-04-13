@@ -7,7 +7,8 @@ export default function PollOptions({
     slug,
     options = [],
     answer = []
-}: { slug: string; idMultichoice: boolean, options: PollOptions[] }) {
+}: { slug: string; idMultichoice: boolean, options: PollOptions[], answer: PollAnswers[] }) {
+    
     if (idMultichoice) {
         return (
             <>
@@ -33,7 +34,7 @@ export default function PollOptions({
             <RadioGroup
                 name={slug}
                 items={options}
-                value={answer[0]?.poll_option_id}
+                value={answer[0]?.poll_option_id?.toString()}
                 disabled={answer.length > 0}
             />
         )
