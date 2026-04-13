@@ -58,8 +58,22 @@ class PollController extends Controller
             $data['poll_option_id'] = $request->{$slug};
             PollAnswer::create($data);
         }
-        broadcast(new PollAnswerAdded($poll))->toOthers();
+        $this->updatePollPercentage($poll);
 
+        broadcast(new PollAnswerAdded($poll))->toOthers();
         return redirect()->back();
+    }
+
+    /**
+     * Update percentage for poll options
+     */
+    public function updatePollPercentage($poll)
+    {
+        $options = $poll->options()->get();
+        $totalAnswers = PollAnswer::answerCount($poll->id);
+        foreach ($options as $option) {
+            $option->percentage = round(($option->answers()->count() / $totalAnswers) * 100, 2);
+            $option->save();
+        }
     }
 }
