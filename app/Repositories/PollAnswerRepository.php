@@ -43,7 +43,7 @@ class PollAnswerRepository implements PollAnswerRepositoryInterface
     public function updateAnswerPercentage(Poll $poll)
     {
         $options = $poll->options()->get();
-        $totalAnswers = PollAnswer::answerCount($poll->id);
+        $totalAnswers = $this->answerCount($poll);
         foreach ($options as $option) {
             $option->percentage = round(($option->answers()->count() / $totalAnswers) * 100, 2);
             $option->save();
