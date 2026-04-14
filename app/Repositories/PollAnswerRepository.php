@@ -12,7 +12,11 @@ class PollAnswerRepository implements PollAnswerRepositoryInterface
     public function userAnswers(Poll $poll): Collection
     {
         return PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
-            $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
+            if(auth()->check()){
+                $query->where('user_id', auth()->id());
+            } else {
+                $query->Where('ip_address', request()->ip());
+            }
         })->select(['id', 'poll_option_id'])->get();
     }
 
