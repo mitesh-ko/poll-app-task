@@ -60,6 +60,7 @@ class PollsTable
                     ];
                 }),
             ])
+            ->defaultSort('id', 'desc') 
             ->toolbarActions([
             ]);
     }

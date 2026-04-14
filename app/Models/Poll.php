@@ -13,6 +13,10 @@ class Poll extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'data' => 'array'
+    ];
+
     public function options(): HasMany
     {
         return $this->hasMany(PollOption::class);

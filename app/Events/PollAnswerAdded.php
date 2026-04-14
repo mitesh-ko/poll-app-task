@@ -2,7 +2,11 @@
 
 namespace App\Events;
 
-use App\Models\PollAnswer;
+use App\Interfaces\PollAnswerRepositoryInterface;
+use App\Interfaces\PollOptionRepositoryInterface;
+use App\Models\Poll;
+use App\Repositories\PollAnswerRepository;
+use App\Repositories\PollOptionRepository;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -13,14 +17,17 @@ class PollAnswerAdded implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $poll;
-
+    protected $poll;
+    protected $pollAnswerRepository;
+    protected $pollOptionRepository;
     /**
      * Create a new event instance.
      */
-    public function __construct($poll)
+    public function __construct(Poll $poll)
     {
         $this->poll = $poll;
+        $this->pollAnswerRepository = new PollAnswerRepository();
+        $this->pollOptionRepository = new PollOptionRepository();
     }
 
     /**
@@ -38,10 +45,8 @@ class PollAnswerAdded implements ShouldBroadcastNow
     public function broadcastWith()
     {
         return [
-            'ansCount' => PollAnswer::where('poll_id', $this->poll->id)
-            ->distinct('user_id')
-            ->distinct('ip_address')
-            ->count()
+            'ansCount' => $this->pollAnswerRepository->answerCount($this->poll),
+            'ansPercentage' => $this->pollOptionRepository->optionIntereastPercentage($this->poll)
         ];
     }
 }
