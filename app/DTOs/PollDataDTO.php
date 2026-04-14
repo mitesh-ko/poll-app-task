@@ -8,7 +8,7 @@ readonly class PollDataDTO
         public int $totalAns,
     ) {}
 
-    public static function storePollMeta($details): self
+    public static function verifyMetaData($details): self
     {
         return new self(
             winnerOption: $details['option_id'],
