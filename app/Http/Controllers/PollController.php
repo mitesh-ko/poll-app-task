@@ -6,17 +6,21 @@ use App\Events\PollAnswerAdded;
 use App\Http\Requests\StorePollAnswer;
 use App\Interfaces\PollAnswerRepositoryInterface;
 use App\Interfaces\PollRepositoryInterface;
+use App\Services\PollService;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class PollController extends Controller
 {
+    protected $pollService;
 
     public function __construct(
         protected PollRepositoryInterface $pollRepository,
         protected PollAnswerRepositoryInterface $pollAnswerRepository
-    ) {}
+    ) {
+        $this->pollService = new PollService();
+    }
 
     /**
      * Load inertia view with respective data
@@ -26,7 +30,7 @@ class PollController extends Controller
         $poll = $this->pollRepository->firstPollWithOptions($slug);
 
         // check if user already sub answer on poll
-        $canAns = $this->pollAnswerRepository->canAnswerOnPoll($poll);
+        $canAns = $this->pollService->canAnswerOnPoll($poll);
 
         // user selected answer
         $answer = $this->pollAnswerRepository->userAnswers($poll);

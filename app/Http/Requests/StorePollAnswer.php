@@ -4,18 +4,21 @@ namespace App\Http\Requests;
 
 use App\Interfaces\PollAnswerRepositoryInterface;
 use App\Interfaces\PollRepositoryInterface;
-use App\Models\Poll;
-use App\Repositories\PollAnswerRepository;
+use App\Services\PollService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
 class StorePollAnswer extends FormRequest
 {
+    protected $pollService;
+
     public function __construct(
         protected PollRepositoryInterface $pollRepository,
         protected PollAnswerRepositoryInterface $pollAnswerRepository
-    ) {}
+    ) {
+        $this->pollService = new PollService();
+    }
 
     /**
      * Determine if the user is authorized to make this request.
@@ -55,7 +58,7 @@ class StorePollAnswer extends FormRequest
             $slug = $this->route('slug');
             $poll = $poll = $this->pollRepository->firstPoll($slug);
             
-            $canAns = $this->pollAnswerRepository->canAnswerOnPoll($poll);
+            $canAns = $this->pollService->canAnswerOnPoll($poll);;
 
             if (!$canAns) {
                 $validator->errors()->add(

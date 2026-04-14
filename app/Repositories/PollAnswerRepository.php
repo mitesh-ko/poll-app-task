@@ -9,13 +9,6 @@ use Illuminate\Database\Eloquent\Collection;
 
 class PollAnswerRepository implements PollAnswerRepositoryInterface
 {
-    public function canAnswerOnPoll(Poll $poll): bool
-    {
-        return PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
-            $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
-        })->count() == 0 && $poll->end_at > now();
-    }
-
     public function userAnswers(Poll $poll): Collection
     {
         return PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
@@ -50,6 +43,9 @@ class PollAnswerRepository implements PollAnswerRepositoryInterface
         }
     }
 
+    /**
+     * total users answered
+     */
     public function answerCount(Poll $poll): int 
     {
         return PollAnswer::where('poll_id', $poll->id)->distinct('user_id')->distinct('ip_address')->count();
