@@ -22,8 +22,4 @@ class PollAnswer extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-
-    public static function answerCount($pollId) {
-        return self::where('poll_id', $pollId)->distinct('user_id')->distinct('ip_address')->count();
-    }
 }
