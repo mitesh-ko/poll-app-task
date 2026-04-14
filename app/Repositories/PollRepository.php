@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Interfaces\PollRepositoryInterface;
 use App\Models\Poll;
+use Illuminate\Database\Eloquent\Collection;
 
 class PollRepository implements PollRepositoryInterface
 {
@@ -27,5 +28,10 @@ class PollRepository implements PollRepositoryInterface
     public function firstPoll($slug): Poll
     {
         return Poll::where('slug', $slug)->firstOrFail();
+    }
+
+    public function endedPollsNotHaveMeta(): Collection
+    {
+        return Poll::where('end_at', '<', now())->whereNull('data')->get();
     }
 }

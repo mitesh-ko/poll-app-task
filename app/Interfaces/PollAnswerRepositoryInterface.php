@@ -3,11 +3,13 @@
 namespace App\Interfaces;
 
 use App\Models\Poll;
+use App\Models\PollAnswer;
+use Illuminate\Database\Eloquent\Collection;
 
 interface PollAnswerRepositoryInterface {
     public function canAnswerOnPoll(Poll $poll): bool;
-    public function userAnswers(Poll $poll);
-    public function storePollAnswer(Poll $poll, array $answers);
+    public function userAnswers(Poll $poll): Collection;
+    public function storePollAnswer(Poll $poll, array $answers): bool;
     public function updateAnswerPercentage(Poll $poll);
     public function answerCount(Poll $poll): int;
 }

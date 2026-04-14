@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Interfaces\PollAnswerRepositoryInterface;
 use App\Models\Poll;
 use App\Models\PollAnswer;
+use Illuminate\Database\Eloquent\Collection;
 
 class PollAnswerRepository implements PollAnswerRepositoryInterface
 {
@@ -15,14 +16,14 @@ class PollAnswerRepository implements PollAnswerRepositoryInterface
         })->count() == 0 && $poll->end_at > now();
     }
 
-    public function userAnswers(Poll $poll)
+    public function userAnswers(Poll $poll): Collection
     {
         return PollAnswer::where('poll_id', $poll->id)->where(function ($query) {
             $query->where('user_id', auth()->id())->orWhere('ip_address', request()->ip());
         })->select(['id', 'poll_option_id'])->get();
     }
 
-    public function storePollAnswer(Poll $poll, array $answers)
+    public function storePollAnswer(Poll $poll, array $answers): bool
     {
         $ansData = [
             'user_id' => auth()->id(), // auth user id or null
@@ -36,7 +37,7 @@ class PollAnswerRepository implements PollAnswerRepositoryInterface
             $ansData['updated_at'] = now();
             $storeData[] = $ansData;
         }
-        PollAnswer::insert($storeData);
+        return PollAnswer::insert($storeData);
     }
 
     public function updateAnswerPercentage(Poll $poll)
@@ -49,7 +50,8 @@ class PollAnswerRepository implements PollAnswerRepositoryInterface
         }
     }
 
-    public function answerCount(Poll $poll): int {
+    public function answerCount(Poll $poll): int 
+    {
         return PollAnswer::where('poll_id', $poll->id)->distinct('user_id')->distinct('ip_address')->count();
     }
 }
